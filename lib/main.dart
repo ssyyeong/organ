@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:organ/screen/login_screen.dart';
+import 'package:organ/screen/auth/login_screen.dart';
 import 'package:organ/config/route_generator.dart';
 
 void main() {

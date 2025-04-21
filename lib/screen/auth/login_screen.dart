@@ -1,40 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:organ/config/color_constants.dart';
-import 'package:organ/controller/base/controller.dart';
-import 'package:organ/controller/custom/controller_custom.dart';
-import 'package:organ/widgets/button_widget.dart';
 import 'package:organ/widgets/full_width_btn.dart';
 import 'package:organ/widgets/text_form_field_widget.dart';
-import 'package:organ/config/route.dart'; // Routes 클래스 import 추가
+import 'package:organ/controller/custom/controller_custom.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-//비밀번호 변경 화면
-class ChangePasswordScreen extends StatefulWidget {
-  const ChangePasswordScreen({super.key});
+//로그인 메인 화면
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ChangePasswordState();
+  State<StatefulWidget> createState() => _LoginState();
 }
 
-class _ChangePasswordState extends State<ChangePasswordScreen> {
+class _LoginState extends State<LoginScreen> {
   final _key = GlobalKey<FormState>();
-  late String _password = '', _passwordCheck = '';
+  late String _id = '', _password = '';
 
   @override
   void initState() {
     super.initState();
   }
 
-  void changePassword() async {
-    await Controller(
+  Future<void> login() async {
+    await ControllerCustom(
       modelName: 'AppMemberOrgan',
       modelId: 'app_member_organ',
-    ).update({'PASSWORD': _password}).then((res) {
+    ).signIn({'ID': _id, 'PASSWORD': _password}).then((res) async {
+      if (!mounted) return;
       if (res['result'] == null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('비밀번호 변경 실패')));
+        ).showSnackBar(const SnackBar(content: Text('아이디 또는 비밀번호가 틀렸습니다.')));
       } else {
-        Navigator.pushNamed(context, '/home');
+        if (res['result']['user']['CREATED_AT'] ==
+            res['result']['user']['UPDATED_AT']) {
+          if (!mounted) return;
+          Navigator.pushNamed(context, '/changePassword');
+        } else {
+          SharedPreferences prefs;
+          prefs = await SharedPreferences.getInstance();
+          await prefs.setInt(
+            'userId',
+            res['result']['user']['APP_MEMBER_ORGAN_IDENTIFICATION_CODE'],
+          );
+          if (!mounted) return;
+          Navigator.pushNamed(context, '/matching');
+        }
       }
     });
   }
@@ -54,39 +66,43 @@ class _ChangePasswordState extends State<ChangePasswordScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: SafeArea(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height, // 화면 전체 높이
-                  child: Center(
-                    // Center 위젯 추가
-                    child: Form(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 200),
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: 120,
+                      width: 120,
+                    ),
+                    const SizedBox(height: 30),
+                    Form(
                       key: _key,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          //비밀번호 입력 폼
+                          //이메일 입력 폼
                           Container(
                             margin: const EdgeInsets.only(top: 20),
+                            child: TextFormFieldWidget(
+                              type: 'id',
+                              onSaved: (id) => _id = id as String,
+                            ),
+                          ),
+                          //비밀번호 입력 폼
+                          Container(
+                            margin: const EdgeInsets.only(top: 10, bottom: 15),
                             child: TextFormFieldWidget(
                               type: 'password',
                               onSaved:
                                   (password) => _password = password as String,
                             ),
                           ),
-                          //비밀번호 재입력 폼
-                          Container(
-                            margin: const EdgeInsets.only(top: 10, bottom: 15),
-                            child: TextFormFieldWidget(
-                              type: 'rePassword',
-                              onSaved:
-                                  (password) =>
-                                      _passwordCheck = password as String,
-                            ),
-                          ),
                           FullWidthBtn(
                             type: 'Elevated',
                             title: const Text(
-                              '비밀번호 변경',
+                              '로그인',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -95,18 +111,17 @@ class _ChangePasswordState extends State<ChangePasswordScreen> {
                             ),
                             margin: EdgeInsets.zero,
                             color: ColorConstants.btnPrimary,
-                            onPressed: () {
-                              //유효성 검사
-                              if (_key.currentState!.validate()) {
-                                _key.currentState!.save();
-                                changePassword();
-                              }
-                            },
+                            onPressed:
+                                () => {
+                                  //유효성 검사
+                                  if (_key.currentState!.validate())
+                                    {_key.currentState!.save(), login()},
+                                },
                           ),
                         ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),

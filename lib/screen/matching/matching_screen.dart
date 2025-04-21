@@ -35,7 +35,6 @@ class _MatchingState extends State<MatchingScreen>
   Future<void> fetchMatchingList() async {
     setState(() => isLoading = true);
     try {
-      // API 호출 예시 (실제 API에 맞게 수정 필요)
       SharedPreferences prefs;
       prefs = await SharedPreferences.getInstance();
       int userId = prefs.getInt('userId') ?? 0;
@@ -57,12 +56,13 @@ class _MatchingState extends State<MatchingScreen>
         });
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('데이터 로딩 중 오류가 발생했습니다')));
-    } finally {
-      setState(() => isLoading = false);
     }
+    if (!mounted) return;
+    setState(() => isLoading = false);
   }
 
   Future<void> acceptMatching(String matchingId) async {
@@ -86,10 +86,12 @@ class _MatchingState extends State<MatchingScreen>
         completedList.add(item);
       });
 
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('매칭 수락 완료')));
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('매칭 수락 중 오류가 발생했습니다')));
@@ -114,10 +116,12 @@ class _MatchingState extends State<MatchingScreen>
         );
       });
 
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('매칭 거절 완료')));
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('매칭 거절 중 오류가 발생했습니다')));

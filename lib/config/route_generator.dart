@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:organ/screen/login_screen.dart';
-import 'package:organ/screen/change_password_screen.dart';
-import 'package:organ/screen/matching_screen.dart';
+import 'package:organ/screen/auth/bussiness_info_screen.dart';
+import 'package:organ/screen/auth/login_screen.dart';
+import 'package:organ/screen/auth/change_password_screen.dart';
+import 'package:organ/screen/matching/matching_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -11,6 +12,10 @@ class RouteGenerator {
       case '/changePassword':
         return MaterialPageRoute(
           builder: (context) => const ChangePasswordScreen(),
+        );
+      case '/businessInfo':
+        return MaterialPageRoute(
+          builder: (context) => const BussinessInfoScreen(),
         );
       case '/matching':
         return MaterialPageRoute(builder: (context) => const MatchingScreen());
