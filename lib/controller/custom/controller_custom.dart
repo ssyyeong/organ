@@ -49,8 +49,9 @@ class ControllerCustom {
     if (img.path != '') {
       var request = http.MultipartRequest(
         'POST',
-        Uri.https('$apiUrl', '$rootRoute/common/file/upload_image'),
+        Uri.http('$apiUrl', '$rootRoute/common/file/upload_image'),
       );
+
       request.files.add(
         http.MultipartFile.fromBytes(
           "file",

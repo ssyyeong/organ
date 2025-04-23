@@ -45,7 +45,7 @@ class _LoginState extends State<LoginScreen> {
             res['result']['user']['APP_MEMBER_ORGAN_IDENTIFICATION_CODE'],
           );
           if (!mounted) return;
-          Navigator.pushNamed(context, '/matching');
+          Navigator.pushNamed(context, '/home');
         }
       }
     });

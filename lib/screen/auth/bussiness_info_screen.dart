@@ -8,6 +8,7 @@ import 'package:organ/widgets/text_field_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 class BussinessInfoScreen extends StatefulWidget {
   const BussinessInfoScreen({super.key});
@@ -25,7 +26,7 @@ class _BussinessInfoScreenState extends State<BussinessInfoScreen> {
   bool isCorporation = false;
   DateTime? formationDate;
   String? salesAmount;
-  PlatformFile? irDeckFile;
+  XFile? irDeckFile;
   String? emailError;
 
   bool isValidEmail(String email) {
@@ -46,10 +47,12 @@ class _BussinessInfoScreenState extends State<BussinessInfoScreen> {
       ).showSnackBar(const SnackBar(content: Text('필수 항목을 입력해주세요.')));
       return;
     }
+
     SharedPreferences prefs;
     prefs = await SharedPreferences.getInstance();
     int userId = prefs.getInt('userId') ?? 0;
 
+    File file = File(irDeckFile?.path ?? '');
     await ControllerCustom(
           modelName: 'OrganBusiness',
           modelId: 'organ_business',
@@ -62,9 +65,12 @@ class _BussinessInfoScreenState extends State<BussinessInfoScreen> {
           'EMAIL': email,
           'BUSINESS_ITEM_INTRODUCTION': introduction,
           'IS_CORPORATION': isCorporation ? 'Y' : 'N',
-          'FORMATION_DATE': formationDate,
+          'FORMATION_DATE':
+              formationDate != null
+                  ? '${formationDate?.year}-${formationDate?.month.toString().padLeft(2, '0')}-${formationDate?.day.toString().padLeft(2, '0')}'
+                  : null,
           'PREVIOUS_YEAR_SALES_AMOUNT': salesAmount,
-        }, File(irDeckFile?.path ?? ''))
+        }, file)
         .then((res) {
           if (!mounted) return;
           ScaffoldMessenger.of(
@@ -351,13 +357,17 @@ class _BussinessInfoScreenState extends State<BussinessInfoScreen> {
                           onPressed: () async {
                             FilePickerResult? result = await FilePicker.platform
                                 .pickFiles(
-                                  type: FileType.custom,
-                                  allowedExtensions: ['pdf', 'ppt', 'pptx'],
+                                  type: FileType.any,
+                                  allowMultiple: false,
+                                  dialogTitle: '파일 선택',
+                                  lockParentWindow: true,
                                 );
 
                             if (result != null) {
                               setState(() {
-                                irDeckFile = result.files.first;
+                                irDeckFile = XFile(
+                                  result.files.first.path ?? '',
+                                );
                               });
                             }
                           },

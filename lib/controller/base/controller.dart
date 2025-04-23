@@ -176,22 +176,12 @@ class Controller {
       }
     }
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    String userId = prefs.getString('userId') ?? '';
-    if (userId != '') {
-      createOption.addEntries([
-        MapEntry("APP_MEMBER_IDENTIFICATION_CODE", userId),
-      ]);
-    }
-
     var wrappedCreateOption = {
       "CREATE_OPTION_KEY_LIST": jsonEncode(createOption),
     };
 
-    //todo: createOption에 user id 있는 경우 추가해주기
-    Uri url = Uri.http('$apiUrl', '$rootRoute/$role/$modelId/create');
-    // Uri url = Uri.http('10.0.2.2:4021', '$rootRoute/$role/$modelId/create');
+    // Uri url = Uri.http('$apiUrl', '$rootRoute/$role/$modelId/create');
+    Uri url = Uri.http('10.0.2.2:4021', '$rootRoute/$role/$modelId/create');
 
     final response = await http.post(url, body: wrappedCreateOption);
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:organ/screen/auth/bussiness_info_screen.dart';
 import 'package:organ/screen/auth/login_screen.dart';
 import 'package:organ/screen/auth/change_password_screen.dart';
-import 'package:organ/screen/matching/matching_screen.dart';
+import 'package:organ/screen/home_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -17,8 +17,8 @@ class RouteGenerator {
         return MaterialPageRoute(
           builder: (context) => const BussinessInfoScreen(),
         );
-      case '/matching':
-        return MaterialPageRoute(builder: (context) => const MatchingScreen());
+      case '/home':
+        return MaterialPageRoute(builder: (context) => const HomeScreen());
       default:
         return MaterialPageRoute(builder: (context) => const LoginScreen());
     }
