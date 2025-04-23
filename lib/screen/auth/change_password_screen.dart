@@ -31,7 +31,7 @@ class _ChangePasswordState extends State<ChangePasswordScreen> {
           context,
         ).showSnackBar(const SnackBar(content: Text('비밀번호 변경 실패')));
       } else {
-        Navigator.pushNamed(context, '/');
+        Navigator.pushNamed(context, '/businessInfo');
       }
     });
   }

@@ -1,5 +1,6 @@
 import 'package:organ/config/color_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 //텍스트 필드 위젯
 class TextFieldWidget extends StatelessWidget {
@@ -12,6 +13,8 @@ class TextFieldWidget extends StatelessWidget {
     this.textType, // 키보드 입력 타입
     this.obscureText, //textField 입력 시 text를 숨길지 말지 결정하는 변수(password 입력 시 사용)
     this.isReadOnly,
+    this.errorText,
+    this.inputFormatters,
   });
 
   final String hintText;
@@ -21,6 +24,8 @@ class TextFieldWidget extends StatelessWidget {
   final TextInputType? textType;
   final bool? obscureText;
   final bool? isReadOnly;
+  final String? errorText;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +35,7 @@ class TextFieldWidget extends StatelessWidget {
       onChanged: onChanged,
       obscureText: obscureText ?? false,
       readOnly: isReadOnly ?? false,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
@@ -47,6 +53,8 @@ class TextFieldWidget extends StatelessWidget {
           vertical: 17,
           horizontal: 15,
         ),
+        errorText: errorText,
+        errorStyle: TextStyle(color: Colors.red, fontSize: 12),
       ),
     );
   }

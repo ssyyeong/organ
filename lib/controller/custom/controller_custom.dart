@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:organ/controller/base/controller.dart';
 import 'package:organ/setting/server.dart';
 import 'package:http/http.dart' as http;
 
@@ -40,5 +42,35 @@ class ControllerCustom {
       return responseMap;
     }
     throw Exception('Failed to load data');
+  }
+
+  //설문조사
+  Future<Map<String, dynamic>> irFileUpload(Map option, File img) async {
+    if (img.path != '') {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.https('$apiUrl', '$rootRoute/common/file/upload_image'),
+      );
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          "file",
+          img.readAsBytesSync(),
+          filename: img.path.split("/").last,
+        ),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseMap = json.decode(response.body);
+        option['IR_DECK'] = json.encode(responseMap['result']);
+      }
+    }
+
+    return Controller(
+      modelName: 'OrganBusiness',
+      modelId: 'organ_business',
+    ).create(option);
   }
 }
