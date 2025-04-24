@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:organ/setting/server.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Controller {
   //api 경로
@@ -180,8 +179,8 @@ class Controller {
       "CREATE_OPTION_KEY_LIST": jsonEncode(createOption),
     };
 
-    // Uri url = Uri.http('$apiUrl', '$rootRoute/$role/$modelId/create');
-    Uri url = Uri.http('10.0.2.2:4021', '$rootRoute/$role/$modelId/create');
+    Uri url = Uri.http('$apiUrl', '$rootRoute/$role/$modelId/create');
+    // Uri url = Uri.http('10.0.2.2:4021', '$rootRoute/$role/$modelId/create');
 
     final response = await http.post(url, body: wrappedCreateOption);
 
