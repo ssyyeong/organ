@@ -55,7 +55,7 @@ class _MyPageState extends State<MyPageScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: ColorConstants.bgWhite,
         appBar: AppBar(
           title: const Text(
             '마이페이지',
@@ -66,43 +66,102 @@ class _MyPageState extends State<MyPageScreen> {
           automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '내 정보',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              // 프로필 섹션
+              Container(
+                padding: const EdgeInsets.all(24.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '기업 정보',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF333333),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (businessInfo != null) ...[
+                      _buildInfoItem('기업명', businessInfo!['COMPANY_NAME']),
+                      _buildInfoItem(
+                        '대표자',
+                        businessInfo!['REPRESENTATIVE_NAME'],
+                      ),
+                      _buildInfoItem('휴대전화', businessInfo!['PHONE_NUMBER']),
+                      _buildInfoItem('이메일', businessInfo!['EMAIL']),
+                    ] else
+                      const Center(child: CircularProgressIndicator()),
+                  ],
+                ),
               ),
-              const SizedBox(height: 20),
-              if (businessInfo != null) ...[
-                _buildInfoItem('기업명', businessInfo!['COMPANY_NAME']),
-                _buildInfoItem('대표자', businessInfo!['REPRESENTATIVE_NAME']),
-                _buildInfoItem('휴대전화', businessInfo!['PHONE_NUMBER']),
-                _buildInfoItem('이메일', businessInfo!['EMAIL']),
-                _buildInfoItem(
-                  '사업 아이템',
-                  businessInfo!['BUSINESS_ITEM_INTRODUCTION'],
+              // 구분선 추가
+              Container(height: 8, color: ColorConstants.bgWhite),
+              // 사업 정보 섹션
+              Container(
+                padding: const EdgeInsets.all(24.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                _buildInfoItem(
-                  '법인설립여부',
-                  businessInfo!['IS_CORPORATION'] == 'Y' ? '설립' : '미설립',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '사업 정보',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF333333),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (businessInfo != null) ...[
+                      _buildInfoItem(
+                        '사업 아이템',
+                        businessInfo!['BUSINESS_ITEM_INTRODUCTION'],
+                      ),
+                      _buildInfoItem(
+                        '법인설립여부',
+                        businessInfo!['IS_CORPORATION'] == 'Y' ? '설립' : '미설립',
+                      ),
+                      _buildInfoItem(
+                        '설립연도/월',
+                        businessInfo!['FORMATION_DATE'] != null
+                            ? businessInfo!['FORMATION_DATE']
+                                .toString()
+                                .substring(0, 10)
+                            : '-',
+                      ),
+                      _buildInfoItem(
+                        '직전년도 매출액',
+                        businessInfo!['PREVIOUS_YEAR_SALES_AMOUNT'],
+                      ),
+                    ] else
+                      const Center(child: CircularProgressIndicator()),
+                  ],
                 ),
-                _buildInfoItem(
-                  '설립연도/월',
-                  businessInfo!['FORMATION_DATE'] != null
-                      ? businessInfo!['FORMATION_DATE'].toString().substring(
-                        0,
-                        10,
-                      )
-                      : '-',
-                ),
-                _buildInfoItem(
-                  '직전년도 매출액',
-                  businessInfo!['PREVIOUS_YEAR_SALES_AMOUNT'],
-                ),
-              ] else
-                Center(child: CircularProgressIndicator()),
+              ),
             ],
           ),
         ),
@@ -112,14 +171,25 @@ class _MyPageState extends State<MyPageScreen> {
 
   Widget _buildInfoItem(String label, String? value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 16, color: Colors.grey[600])),
           Text(
-            value ?? '-',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            label,
+            style: const TextStyle(fontSize: 16, color: Color(0xFF666666)),
+          ),
+          Flexible(
+            child: Text(
+              value ?? '-',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF333333),
+              ),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

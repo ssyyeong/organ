@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:organ/custom/bottom_navigation.dart';
 
 import 'package:organ/screen/matching/matching_screen.dart';
+import 'package:organ/screen/meeting/meeting_screen.dart';
 import 'package:organ/screen/my_page/my_page_screen.dart';
 import 'package:organ/screen/program/program_screen.dart';
 
@@ -13,10 +14,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   final List<Widget> _widgetOptions = [
-    const MyPageScreen(),
+    const MeetingScreen(),
     const ProgramScreen(),
+    const MyPageScreen(),
   ];
 
   void _onItemTapped(int index) {

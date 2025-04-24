@@ -72,14 +72,12 @@ class _ProgramState extends State<ProgramScreen>
 
   // 신청한 프로그램 리스트 데이터 불러오기
   Future<void> fetchAppliedProgramList() async {
-    print(userId);
     setState(() => isLoading = true);
     try {
       Controller(
         modelName: 'OrganProgramApplication',
         modelId: 'organ_program_application',
       ).findAll({'APP_MEMBER_ORGAN_IDENTIFICATION_CODE': userId}).then((res) {
-        print(res);
         res['result']['rows'].forEach((element) {
           setState(() {
             completedList.add(element);
