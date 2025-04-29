@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:path/path.dart' as path;
 
 import 'package:flutter/material.dart';
 import 'package:organ/config/color_constants.dart';
 import 'package:organ/controller/base/controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 //미팅일지 화면
 class MeetingScreen extends StatefulWidget {
@@ -48,8 +53,14 @@ class _MeetingState extends State<MeetingScreen> {
         modelName: 'OrganMeeting',
         modelId: 'organ_meeting',
       ).findAll({}).then((res) {
+        List<Map<String, dynamic>> newMeetingList = [];
+        res['result']['rows'].forEach((element) {
+          element['DIAGNOSTIC_REPORT'] != null
+              ? newMeetingList.add(element)
+              : null;
+        });
         setState(() {
-          meetingList = res['result']['rows'];
+          meetingList = newMeetingList;
         });
       });
     } catch (e) {
@@ -103,110 +114,19 @@ class _MeetingState extends State<MeetingScreen> {
                   ),
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildDetailItem(
-                          '미팅일시',
-                          meeting['MEETING_DATE']?.toString().substring(
-                                0,
-                                10,
-                              ) ??
-                              '',
-                        ),
-                        _buildDetailItem(
-                          '담당자',
-                          meeting['RESPONSIBLE_PERSON'] ?? '',
-                        ),
-                        _buildDetailItem(
-                          '사업화단계',
-                          meeting['BUSINESS_PHASE'] ?? '',
-                        ),
-                        _buildDetailItem(
-                          '미팅내용',
-                          meeting['MEETING_CONTENT'] ?? '',
-                        ),
-                        const SizedBox(height: 24),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8F9FA),
-                            borderRadius: BorderRadius.circular(12),
+                  child:
+                      meeting['DIAGNOSTIC_REPORT'] != null
+                          ? _buildFileViewer(
+                            jsonDecode(
+                              meeting['DIAGNOSTIC_REPORT'],
+                            )[0]['FILE_URL'],
+                          )
+                          : const Center(
+                            child: Text(
+                              '파일이 존재하지 않습니다',
+                              style: TextStyle(color: Colors.red),
+                            ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                '진단 항목 점수',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF333333),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              _buildDiagnosticScoreItem(
-                                '팀구성 및 역량',
-                                int.tryParse(
-                                      meeting['DIAGNOSTIC_ITEM_SCORE1']
-                                              ?.toString() ??
-                                          '0',
-                                    ) ??
-                                    0,
-                              ),
-                              _buildDiagnosticScoreItem(
-                                '수요 및 시장이해',
-                                int.tryParse(
-                                      meeting['DIAGNOSTIC_ITEM_SCORE2']
-                                              ?.toString() ??
-                                          '0',
-                                    ) ??
-                                    0,
-                              ),
-                              _buildDiagnosticScoreItem(
-                                '사업모델',
-                                int.tryParse(
-                                      meeting['DIAGNOSTIC_ITEM_SCORE3']
-                                              ?.toString() ??
-                                          '0',
-                                    ) ??
-                                    0,
-                              ),
-                              _buildDiagnosticScoreItem(
-                                '판매/영업채널',
-                                int.tryParse(
-                                      meeting['DIAGNOSTIC_ITEM_SCORE4']
-                                              ?.toString() ??
-                                          '0',
-                                    ) ??
-                                    0,
-                              ),
-                              _buildDiagnosticScoreItem(
-                                '재무계획',
-                                int.tryParse(
-                                      meeting['DIAGNOSTIC_ITEM_SCORE5']
-                                              ?.toString() ??
-                                          '0',
-                                    ) ??
-                                    0,
-                              ),
-                              _buildDiagnosticScoreItem(
-                                '성장전략',
-                                int.tryParse(
-                                      meeting['DIAGNOSTIC_ITEM_SCORE6']
-                                              ?.toString() ??
-                                          '0',
-                                    ) ??
-                                    0,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -214,57 +134,17 @@ class _MeetingState extends State<MeetingScreen> {
     );
   }
 
-  Widget _buildDetailItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF666666),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, color: Color(0xFF333333)),
-          ),
-        ],
+  Widget _buildFileViewer(String fileUrl) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFEEEEEE)),
+        borderRadius: BorderRadius.circular(8),
       ),
-    );
-  }
-
-  Widget _buildDiagnosticScoreItem(String title, int score) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF666666)),
-          ),
-          Row(
-            children: [
-              Text(
-                '$score',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF333333),
-                ),
-              ),
-              const Text(
-                ' / 10',
-                style: TextStyle(fontSize: 14, color: Color(0xFF999999)),
-              ),
-            ],
-          ),
-        ],
+      child: SfPdfViewer.network(
+        fileUrl,
+        onPageChanged: (PdfPageChangedDetails details) {},
+        onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {},
       ),
     );
   }
@@ -330,7 +210,7 @@ class _MeetingState extends State<MeetingScreen> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                '${item['MEETING_DATE'].toString().substring(0, 10)} 미팅일지',
+                                '${item['MEETING_DATE'].toString().substring(0, 10)} 진단리포트',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFF333333),

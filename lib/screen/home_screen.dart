@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:organ/custom/bottom_navigation.dart';
 
-import 'package:organ/screen/matching/matching_screen.dart';
 import 'package:organ/screen/meeting/meeting_screen.dart';
 import 'package:organ/screen/my_page/my_page_screen.dart';
 import 'package:organ/screen/program/program_screen.dart';
